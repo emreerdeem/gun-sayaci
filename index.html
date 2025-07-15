@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #111;
+      background-color: #0f0f0f;
       color: #00ff88;
       display: flex;
       flex-direction: column;
@@ -14,22 +14,53 @@
       justify-content: center;
       height: 100vh;
       margin: 0;
+      padding: 20px;
     }
+
     h1 {
       font-size: 48px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
+
     #counter {
       font-size: 72px;
       font-weight: bold;
+      margin-bottom: 8px;
     }
-    #time, #remaining {
+
+    #time {
       font-size: 28px;
-      margin-top: 12px;
-      color: #ccc;
+      margin-bottom: 12px;
+      color: #aaa;
     }
+
     #remaining {
+      font-size: 24px;
       color: #ffcc00;
+      margin-bottom: 20px;
+    }
+
+    .progress-container {
+      width: 80%;
+      height: 25px;
+      background-color: #333;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 10px #000;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, #00ff88, #00ccff);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 32px; }
+      #counter { font-size: 48px; }
+      #time, #remaining { font-size: 18px; }
+      .progress-container { width: 95%; }
     }
   </style>
 </head>
@@ -40,33 +71,39 @@
   <div id="time">--:--:--</div>
   <div id="remaining">Hesaplanıyor...</div>
 
+  <div class="progress-container">
+    <div id="progress-bar" class="progress-bar"></div>
+  </div>
+
   <script>
     const startDate = new Date('2025-07-15'); // 1000. gün başlangıç tarihi
+    const totalTargetDays = 1000; // 2000 - 1000 = 1000 gün dolum aralığı
 
     function updateCounter() {
       const now = new Date();
 
-      // Gün farkı hesapla
+      // Gün hesaplama
       const oneDay = 24 * 60 * 60 * 1000;
-      const daysDiff = Math.floor((now.setHours(0,0,0,0) - startDate.setHours(0,0,0,0)) / oneDay);
-      const currentDay = 1000 + daysDiff;
+      const currentDayNum = Math.floor((now.setHours(0, 0, 0, 0) - startDate.setHours(0, 0, 0, 0)) / oneDay) + 1000;
 
-      // Gün yazdır
-      document.getElementById('counter').textContent = `${currentDay}. gün`;
+      document.getElementById('counter').textContent = `${currentDayNum}. gün`;
 
-      // Kalan gün sayısı (2000'e)
-      const daysRemaining = 2000 - currentDay;
-      const kalanMetin = daysRemaining > 0
+      // Saat
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('time').textContent = `${hh}:${mm}:${ss}`;
+
+      // 2000. güne kalan
+      const daysRemaining = 2000 - currentDayNum;
+      const remainingText = daysRemaining > 0
         ? `2000. güne ${daysRemaining} gün kaldı.`
         : `2000. gün ${-daysRemaining} gün önceydi.`;
-      document.getElementById('remaining').textContent = kalanMetin;
+      document.getElementById('remaining').textContent = remainingText;
 
-      // Saat bilgisi
-      const timeNow = new Date();
-      const hh = String(timeNow.getHours()).padStart(2, '0');
-      const mm = String(timeNow.getMinutes()).padStart(2, '0');
-      const ss = String(timeNow.getSeconds()).padStart(2, '0');
-      document.getElementById('time').textContent = `${hh}:${mm}:${ss}`;
+      // Progress bar hesapla
+      const progress = Math.min(100, ((currentDayNum - 1000) / totalTargetDays) * 100);
+      document.getElementById('progress-bar').style.width = `${progress}%`;
     }
 
     updateCounter();
