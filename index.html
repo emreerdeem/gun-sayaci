@@ -29,6 +29,7 @@
     height: 100vh;
     z-index: 0;
   }
+<div class="heart" aria-label="Kalp">&#10084;&#65039;</div>
 
   .counter {
     background: rgba(255, 255, 255, 0.15);
@@ -67,6 +68,22 @@
     align-items: center;
     justify-content: center;
   }
+.heart {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 28px;
+  color: #ff4b5c;
+  text-shadow: 0 0 6px #ff4b5c88;
+  cursor: default;
+  user-select: none;
+  z-index: 10;
+  transition: transform 0.3s ease;
+}
+
+.heart:hover {
+  transform: scale(1.3);
+}
 
   .emoji {
     margin-left: 10px;
