@@ -29,7 +29,6 @@
     height: 100vh;
     z-index: 0;
   }
-<div class="heart" aria-label="Kalp">&#10084;&#65039;</div>
 
   .counter {
     background: rgba(255, 255, 255, 0.15);
@@ -68,22 +67,6 @@
     align-items: center;
     justify-content: center;
   }
-.heart {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  font-size: 28px;
-  color: #ff4b5c;
-  text-shadow: 0 0 6px #ff4b5c88;
-  cursor: default;
-  user-select: none;
-  z-index: 10;
-  transition: transform 0.3s ease;
-}
-
-.heart:hover {
-  transform: scale(1.3);
-}
 
   .emoji {
     margin-left: 10px;
@@ -133,6 +116,24 @@
     text-shadow: 0 1px 4px #ffce00;
   }
 
+  /* Kalp ikonu */
+  .heart {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 28px;
+    color: #ff4b5c;
+    text-shadow: 0 0 6px #ff4b5c88;
+    cursor: default;
+    user-select: none;
+    z-index: 10;
+    transition: transform 0.3s ease;
+  }
+
+  .heart:hover {
+    transform: scale(1.3);
+  }
+
   /* Responsive */
   @media(max-width: 400px){
     .counter {
@@ -164,6 +165,12 @@
     .countdown {
       font-size: 1rem;
     }
+
+    .heart {
+      font-size: 22px;
+      bottom: 15px;
+      right: 15px;
+    }
   }
 </style>
 </head>
@@ -189,6 +196,9 @@
     <div class="progress-text" id="progressText">0%</div>
   </div>
 </div>
+
+<!-- Kalp ikonu -->
+<div class="heart" aria-label="Kalp">&#10084;&#65039;</div>
 
 <script>
   // Sabitler
