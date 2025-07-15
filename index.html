@@ -49,6 +49,15 @@
     margin-top: 5px;
     letter-spacing: 3px;
     text-shadow: 0 2px 10px #ffce00;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .emoji {
+    margin-left: 10px;
+    font-size: 2.8rem;
+    user-select: none;
   }
 
   .bar-container {
@@ -88,6 +97,11 @@
     .number {
       font-size: 2.6rem;
     }
+
+    .emoji {
+      font-size: 2rem;
+      margin-left: 6px;
+    }
   }
 </style>
 </head>
@@ -96,9 +110,13 @@
 <div class="counter">
   <h1>Gün Sayacı</h1>
   <p>Bugün:</p>
-  <div class="number" id="currentDay">0</div>
+  <div class="number" id="currentDay">
+    0 <span class="emoji" title="Alev">🔥</span>
+  </div>
   <p>2000. güne kalan:</p>
-  <div class="number" id="daysLeft">0</div>
+  <div class="number" id="daysLeft">
+    0 <span class="emoji" title="Azalan">⬇️</span>
+  </div>
   <div class="bar-container" aria-label="İlerleme durumu">
     <div class="bar" id="progressBar"></div>
   </div>
@@ -119,8 +137,8 @@
     let daysLeft = targetDayNumber - currentDay;
     if(daysLeft < 0) daysLeft = 0;
 
-    document.getElementById('currentDay').innerText = currentDay;
-    document.getElementById('daysLeft').innerText = daysLeft;
+    document.getElementById('currentDay').childNodes[0].nodeValue = currentDay + ' ';
+    document.getElementById('daysLeft').childNodes[0].nodeValue = daysLeft + ' ';
 
     const progressPercent = ((currentDay - baseDayNumber) / (targetDayNumber - baseDayNumber)) * 100;
     document.getElementById('progressBar').style.width = progressPercent + '%';
