@@ -3,19 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Gün Sayacı</title>
+<title>Gün Sayacı - Gelişmiş</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
 
+  /* Arka plan ve yıldız animasyonu */
   body {
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    height: 100vh;
     margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
     font-family: 'Montserrat', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     color: #f0f0f5;
+    position: relative;
+  }
+
+  /* Canvas arka plan için */
+  #starfield {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
   }
 
   .counter {
@@ -24,9 +36,11 @@
     border-radius: 20px;
     padding: 40px 50px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    width: 350px;
+    width: 370px;
     text-align: center;
     box-sizing: border-box;
+    z-index: 1;
+    position: relative;
   }
 
   h1 {
@@ -37,14 +51,14 @@
   }
 
   p {
-    font-size: 1.4rem;
-    margin: 15px 0;
+    font-size: 1.3rem;
+    margin: 15px 0 5px 0;
     letter-spacing: 0.5px;
   }
 
   .number {
     font-weight: 700;
-    font-size: 3.4rem;
+    font-size: 3.2rem;
     color: #ffe600;
     margin-top: 5px;
     letter-spacing: 3px;
@@ -68,6 +82,7 @@
     width: 100%;
     overflow: hidden;
     box-shadow: inset 0 0 5px rgba(255,255,255,0.4);
+    position: relative;
   }
 
   .bar {
@@ -76,7 +91,29 @@
     width: 0%;
     border-radius: 25px 0 0 25px;
     box-shadow: 0 0 12px #ffce00;
-    transition: width 1s ease-in-out;
+    transition: width 0.8s ease-in-out;
+  }
+
+  .progress-text {
+    position: absolute;
+    width: 100%;
+    top: 0; left: 0;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-shadow: 1px 1px 0 #fff;
+    user-select: none;
+    font-size: 1.1rem;
+  }
+
+  .countdown {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffe600;
+    text-shadow: 0 1px 4px #ffce00;
   }
 
   /* Responsive */
@@ -91,7 +128,7 @@
     }
 
     p {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
 
     .number {
@@ -102,12 +139,22 @@
       font-size: 2rem;
       margin-left: 6px;
     }
+
+    .progress-text {
+      font-size: 1rem;
+    }
+
+    .countdown {
+      font-size: 1rem;
+    }
   }
 </style>
 </head>
 <body>
 
-<div class="counter">
+<canvas id="starfield"></canvas>
+
+<div class="counter" role="main" aria-label="Gün Sayacı">
   <h1>Gün Sayacı</h1>
   <p>Bugün:</p>
   <div class="number" id="currentDay">
@@ -117,34 +164,117 @@
   <div class="number" id="daysLeft">
     0 <span class="emoji" title="Azalan">⬇️</span>
   </div>
+  <div class="countdown" id="countdownTimer" aria-live="polite" aria-atomic="true" role="timer">
+    -- gün -- saat -- dakika -- saniye
+  </div>
   <div class="bar-container" aria-label="İlerleme durumu">
     <div class="bar" id="progressBar"></div>
+    <div class="progress-text" id="progressText">0%</div>
   </div>
 </div>
 
 <script>
+  // Sabitler
   const baseDayNumber = 1000;          // 15 Temmuz 2025 = 1000. gün
   const targetDayNumber = 2000;        // Hedef 2000. gün
+  const baseDate = new Date(2025, 6, 15);  // 15 Temmuz 2025 JS ay: 6 (Temmuz)
 
-  const baseDate = new Date(2025, 6, 15);
+  // Hedef tarih (2000. günün tarihi)
+  const targetDate = new Date(baseDate);
+  targetDate.setDate(targetDate.getDate() + (targetDayNumber - baseDayNumber));
 
+  // Güncelleme fonksiyonu
   function updateCounter() {
-    const today = new Date();
-    const diffTime = today - baseDate;
+    const now = new Date();
+    const diffTime = now - baseDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
     let currentDay = baseDayNumber + diffDays;
     if(currentDay < baseDayNumber) currentDay = baseDayNumber;
+    if(currentDay > targetDayNumber) currentDay = targetDayNumber;
+
     let daysLeft = targetDayNumber - currentDay;
     if(daysLeft < 0) daysLeft = 0;
 
+    // İlerleme yüzdesi
+    const progressPercent = ((currentDay - baseDayNumber) / (targetDayNumber - baseDayNumber)) * 100;
+
+    // Kalan süreyi gün-saat-dakika-saniye olarak hesapla
+    let remainingMs = targetDate - now;
+    if(remainingMs < 0) remainingMs = 0;
+
+    const remainingDays = Math.floor(remainingMs / (1000 * 60 * 60 * 24));
+    const remainingHours = Math.floor((remainingMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+    const remainingSeconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+
+    // HTML güncellemeleri
     document.getElementById('currentDay').childNodes[0].nodeValue = currentDay + ' ';
     document.getElementById('daysLeft').childNodes[0].nodeValue = daysLeft + ' ';
-
-    const progressPercent = ((currentDay - baseDayNumber) / (targetDayNumber - baseDayNumber)) * 100;
     document.getElementById('progressBar').style.width = progressPercent + '%';
+    document.getElementById('progressText').innerText = progressPercent.toFixed(1) + '%';
+
+    document.getElementById('countdownTimer').innerText =
+      `${remainingDays} gün ${remainingHours} saat ${remainingMinutes} dakika ${remainingSeconds} saniye kaldı`;
   }
 
+  // Başlangıç ve saniyede 1 defa güncelle
   updateCounter();
+  setInterval(updateCounter, 1000);
+
+  // ----- Yıldız animasyonu -----
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  let width, height;
+
+  function initCanvas() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    stars = [];
+    const starCount = Math.floor(width * height / 3000); // yıldız sayısı ekran boyutuna göre
+
+    for(let i=0; i<starCount; i++) {
+      stars.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.2 + 0.2,
+        alpha: Math.random(),
+        delta: (Math.random() * 0.02) + 0.005
+      });
+    }
+  }
+
+  function animateStars() {
+    ctx.clearRect(0, 0, width, height);
+    for(let star of stars){
+      star.alpha += star.delta;
+      if(star.alpha <= 0) {
+        star.alpha = 0;
+        star.delta = -star.delta;
+      } else if(star.alpha >= 1){
+        star.alpha = 1;
+        star.delta = -star.delta;
+      }
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.radius, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+      ctx.shadowColor = 'white';
+      ctx.shadowBlur = 4;
+      ctx.fill();
+    }
+    requestAnimationFrame(animateStars);
+  }
+
+  window.addEventListener('resize', () => {
+    initCanvas();
+  });
+
+  initCanvas();
+  animateStars();
 </script>
 
 </body>
