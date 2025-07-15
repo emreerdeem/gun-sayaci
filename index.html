@@ -1,119 +1,168 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Günlük Sayaç</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0f0f0f;
-      color: #00ff88;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      padding: 20px;
-    }
-
-    h1 {
-      font-size: 48px;
-      margin-bottom: 16px;
-    }
-
-    #counter {
-      font-size: 64px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    #time {
-      font-size: 28px;
-      margin-bottom: 12px;
-      color: #aaa;
-    }
-
-    #remaining {
-      font-size: 24px;
-      color: #ffcc00;
-      margin-bottom: 20px;
-    }
-
-    .progress-container {
-      width: 80%;
-      height: 25px;
-      background-color: #333;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 0 10px #000;
-    }
-
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(to right, #00ff88, #00ccff);
-      width: 0%;
-      transition: width 0.5s ease;
-    }
-
-    @media (max-width: 600px) {
-      h1 { font-size: 32px; }
-      #counter { font-size: 48px; }
-      #time, #remaining { font-size: 18px; }
-      .progress-container { width: 95%; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Günlük Sayaç - Yer Değiştiren Metinler</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #0f0f0f;
+    color: #00ff88;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+  #mainText {
+    font-size: 64px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    min-height: 80px;
+    transition: opacity 0.6s ease;
+  }
+  #time {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #aaa;
+  }
+  #remainingText {
+    font-size: 24px;
+    color: #ffcc00;
+    min-height: 32px;
+    margin-bottom: 30px;
+    transition: opacity 0.6s ease;
+  }
+  .progress-container {
+    width: 80%;
+    height: 25px;
+    background-color: #333;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 10px #000;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(to right, #00ff88, #00ccff);
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 32px; }
+    #mainText { font-size: 48px; }
+    #time, #remainingText { font-size: 18px; }
+    .progress-container { width: 95%; }
+  }
+</style>
 </head>
 <body>
 
   <h1>Bugün Kaçıncı Gün?</h1>
-  <div id="counter">Yükleniyor...</div>
+  <div id="mainText">Yükleniyor...</div>
   <div id="time">--:--:--</div>
-  <div id="remaining">Hesaplanıyor...</div>
+  <div id="remainingText">&nbsp;</div>
 
   <div class="progress-container">
     <div id="progress-bar" class="progress-bar"></div>
   </div>
 
-  <script>
-    const startDate = new Date('2026-07-15'); // 1000. gün başlangıcı
-    const initialDayNumber = 1000; // başlangıç sayacı
-    const targetDay = 2000;
+<script>
+  const startDate = new Date('2025-07-15');
+  const initialDayNumber = 1000;
+  const targetDay = 2000;
 
-    function updateCounter() {
-      const now = new Date();
+  let showMain = true; // hangi metin gösterilsin
+  const mainTextEl = document.getElementById('mainText');
+  const remainingTextEl = document.getElementById('remainingText');
+  const timeEl = document.getElementById('time');
+  const progressBar = document.getElementById('progress-bar');
 
-      // Tarihleri sadece yıl-ay-gün olarak al
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-      const oneDay = 24 * 60 * 60 * 1000;
+  function updateData() {
+    const now = new Date();
 
-      const daysPassed = Math.floor((today - start) / oneDay);
-      const currentDay = initialDayNumber + daysPassed;
+    // Gün hesaplama (sadece tarih farkı)
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const oneDay = 24 * 60 * 60 * 1000;
+    const daysPassed = Math.floor((today - start) / oneDay);
+    const currentDay = initialDayNumber + daysPassed;
 
-      document.getElementById('counter').textContent = `${currentDay}. gün`;
+    // Kalan gün
+    const remaining = targetDay - currentDay;
 
-      // Saat bilgisi
-      const hh = String(now.getHours()).padStart(2, '0');
-      const mm = String(now.getMinutes()).padStart(2, '0');
-      const ss = String(now.getSeconds()).padStart(2, '0');
-      document.getElementById('time').textContent = `${hh}:${mm}:${ss}`;
+    // Saat
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    timeEl.textContent = `${hh}:${mm}:${ss}`;
 
-      // Kalan gün hesapla
-      const remaining = targetDay - currentDay;
-      const remainingText = remaining > 0
-        ? `${targetDay}. güne ${remaining} gün kaldı.`
-        : `${targetDay}. gün ${-remaining} gün önceydi.`;
-      document.getElementById('remaining').textContent = remainingText;
+    // İlerleme çubuğu
+    const progress = Math.min(100, ((currentDay - initialDayNumber) / (targetDay - initialDayNumber)) * 100);
+    progressBar.style.width = `${progress}%`;
 
-      // İlerleme çubuğu
-      const progress = Math.min(100, ((currentDay - initialDayNumber) / (targetDay - initialDayNumber)) * 100);
-      document.getElementById('progress-bar').style.width = `${progress}%`;
+    // Metin değişimi için opacity animasyonu
+    if(showMain) {
+      // Gün sayısı göster
+      mainTextEl.style.opacity = 0;
+      remainingTextEl.style.opacity = 0;
+
+      setTimeout(() => {
+        mainTextEl.textContent = `${currentDay}. gün`;
+        remainingTextEl.textContent = '';
+        mainTextEl.style.opacity = 1;
+        remainingTextEl.style.opacity = 1;
+      }, 600);
+    } else {
+      // Kalan gün göster
+      mainTextEl.style.opacity = 0;
+      remainingTextEl.style.opacity = 0;
+
+      setTimeout(() => {
+        mainTextEl.textContent = '';
+        remainingTextEl.textContent = remaining >= 0
+          ? `${targetDay}. güne ${remaining} gün kaldı.`
+          : `${targetDay}. gün ${-remaining} gün önceydi.`;
+        mainTextEl.style.opacity = 1;
+        remainingTextEl.style.opacity = 1;
+      }, 600);
     }
+  }
 
-    updateCounter();
-    setInterval(updateCounter, 1000);
-  </script>
+  // İlk çağrı
+  updateData();
+
+  // Her saniye saat ve progress bar güncellensin
+  setInterval(() => {
+    // Saat ve progress bar her saniye güncellensin
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    timeEl.textContent = `${hh}:${mm}:${ss}`;
+
+    // progress bar
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const oneDay = 24 * 60 * 60 * 1000;
+    const daysPassed = Math.floor((today - start) / oneDay);
+    const currentDay = initialDayNumber + daysPassed;
+    const progress = Math.min(100, ((currentDay - initialDayNumber) / (targetDay - initialDayNumber)) * 100);
+    progressBar.style.width = `${progress}%`;
+  }, 1000);
+
+  // Metin değişimi için 3 saniyede bir toggle
+  setInterval(() => {
+    showMain = !showMain;
+    updateData();
+  }, 3000);
+
+</script>
 
 </body>
 </html>
