@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gün Sayacı</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background-color: #f2f2f2;
+    }
+    h1 {
+      font-size: 48px;
+    }
+    #counter {
+      font-size: 72px;
+      color: #4CAF50;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Bugün Kaçıncı Gün?</h1>
+  <div id="counter">Yükleniyor...</div>
+
+  <script>
+    // Başlangıç tarihi: 1000. günün başladığı tarih
+    const startDate = new Date('2025-07-15');  // YYYY-MM-DD
+    const today = new Date();
+
+    // Saat/dakika/saniye farklarını silmek için sadece yıl-ay-gün alınır
+    const oneDay = 24 * 60 * 60 * 1000; // 1 gün = ms
+    const diffDays = Math.floor((today.setHours(0,0,0,0) - startDate.setHours(0,0,0,0)) / oneDay);
+
+    // İlk gün 1000 olduğu için +1000 ekliyoruz
+    const currentDay = 1000 + diffDays;
+
+    document.getElementById('counter').textContent = `${currentDay}. gün`;
+  </script>
+
+</body>
+</html>
+
