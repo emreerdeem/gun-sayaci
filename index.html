@@ -2,44 +2,92 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Gün Sayacı</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
+
   body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin-top: 80px;
-    background: #f9f9f9;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    height: 100vh;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #f0f0f5;
   }
+
   .counter {
-    background: white;
-    padding: 25px 40px;
-    border-radius: 12px;
-    box-shadow: 0 5px 18px rgba(0,0,0,0.1);
-    display: inline-block;
-    width: 320px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 40px 50px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    width: 350px;
+    text-align: center;
+    box-sizing: border-box;
   }
-  .bar-container {
-    margin-top: 20px;
-    background: #ddd;
-    border-radius: 10px;
-    height: 25px;
-    width: 100%;
-  }
-  .bar {
-    height: 25px;
-    background: #2196f3;
-    border-radius: 10px;
-    width: 0%;
-    transition: width 0.5s ease;
-  }
+
   h1 {
-    margin-bottom: 15px;
-    color: #333;
+    font-size: 2.8rem;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
+
   p {
-    font-size: 18px;
-    margin: 8px 0;
-    color: #555;
+    font-size: 1.4rem;
+    margin: 15px 0;
+    letter-spacing: 0.5px;
+  }
+
+  .number {
+    font-weight: 700;
+    font-size: 3.4rem;
+    color: #ffe600;
+    margin-top: 5px;
+    letter-spacing: 3px;
+    text-shadow: 0 2px 10px #ffce00;
+  }
+
+  .bar-container {
+    margin-top: 35px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 25px;
+    height: 30px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: inset 0 0 5px rgba(255,255,255,0.4);
+  }
+
+  .bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ffce00, #ffaa00);
+    width: 0%;
+    border-radius: 25px 0 0 25px;
+    box-shadow: 0 0 12px #ffce00;
+    transition: width 1s ease-in-out;
+  }
+
+  /* Responsive */
+  @media(max-width: 400px){
+    .counter {
+      width: 90%;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+    }
+
+    .number {
+      font-size: 2.6rem;
+    }
   }
 </style>
 </head>
@@ -47,9 +95,11 @@
 
 <div class="counter">
   <h1>Gün Sayacı</h1>
-  <p><strong>Bugün:</strong> <span id="currentDay">0</span>. gün</p>
-  <p><strong>2000. güne kalan:</strong> <span id="daysLeft">0</span> gün</p>
-  <div class="bar-container">
+  <p>Bugün:</p>
+  <div class="number" id="currentDay">0</div>
+  <p>2000. güne kalan:</p>
+  <div class="number" id="daysLeft">0</div>
+  <div class="bar-container" aria-label="İlerleme durumu">
     <div class="bar" id="progressBar"></div>
   </div>
 </div>
@@ -58,39 +108,25 @@
   const baseDayNumber = 1000;          // 15 Temmuz 2025 = 1000. gün
   const targetDayNumber = 2000;        // Hedef 2000. gün
 
-  // Baz tarih: 15 Temmuz 2025 (Ay 6 çünkü JS 0 tabanlı: 0=Ocak)
   const baseDate = new Date(2025, 6, 15);
 
   function updateCounter() {
     const today = new Date();
-
-    // Gün farkı hesapla (ms -> gün)
     const diffTime = today - baseDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-    // Bugünün gün numarası
     let currentDay = baseDayNumber + diffDays;
-
-    // Eğer bugünden önce tarih girildiyse 1000'den küçük olmasın
     if(currentDay < baseDayNumber) currentDay = baseDayNumber;
-
-    // 2000. güne kalan gün sayısı
     let daysLeft = targetDayNumber - currentDay;
     if(daysLeft < 0) daysLeft = 0;
 
-    // HTML güncellemeleri
     document.getElementById('currentDay').innerText = currentDay;
     document.getElementById('daysLeft').innerText = daysLeft;
 
-    // Progress bar yüzdesi hesapla
     const progressPercent = ((currentDay - baseDayNumber) / (targetDayNumber - baseDayNumber)) * 100;
     document.getElementById('progressBar').style.width = progressPercent + '%';
   }
 
   updateCounter();
-
-  // Eğer sayfa açık kalırsa her gün güncellemek için:
-  // setInterval(updateCounter, 1000 * 60 * 60 * 24);
 </script>
 
 </body>
