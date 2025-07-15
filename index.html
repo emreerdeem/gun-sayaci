@@ -2,21 +2,34 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Gün Sayacı</title>
+  <title>Günlük Sayaç</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 100px;
-      background-color: #f2f2f2;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #111;
+      color: #00ff88;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
     h1 {
       font-size: 48px;
+      margin-bottom: 20px;
     }
     #counter {
       font-size: 72px;
-      color: #4CAF50;
-      margin-top: 20px;
+      font-weight: bold;
+    }
+    #time, #remaining {
+      font-size: 28px;
+      margin-top: 12px;
+      color: #ccc;
+    }
+    #remaining {
+      color: #ffcc00;
     }
   </style>
 </head>
@@ -24,22 +37,41 @@
 
   <h1>Bugün Kaçıncı Gün?</h1>
   <div id="counter">Yükleniyor...</div>
+  <div id="time">--:--:--</div>
+  <div id="remaining">Hesaplanıyor...</div>
 
   <script>
-    // Başlangıç tarihi: 1000. günün başladığı tarih
-    const startDate = new Date('2025-07-15');  // YYYY-MM-DD
-    const today = new Date();
+    const startDate = new Date('2025-07-15'); // 1000. gün başlangıç tarihi
 
-    // Saat/dakika/saniye farklarını silmek için sadece yıl-ay-gün alınır
-    const oneDay = 24 * 60 * 60 * 1000; // 1 gün = ms
-    const diffDays = Math.floor((today.setHours(0,0,0,0) - startDate.setHours(0,0,0,0)) / oneDay);
+    function updateCounter() {
+      const now = new Date();
 
-    // İlk gün 1000 olduğu için +1000 ekliyoruz
-    const currentDay = 1000 + diffDays;
+      // Gün farkı hesapla
+      const oneDay = 24 * 60 * 60 * 1000;
+      const daysDiff = Math.floor((now.setHours(0,0,0,0) - startDate.setHours(0,0,0,0)) / oneDay);
+      const currentDay = 1000 + daysDiff;
 
-    document.getElementById('counter').textContent = `${currentDay}. gün`;
+      // Gün yazdır
+      document.getElementById('counter').textContent = `${currentDay}. gün`;
+
+      // Kalan gün sayısı (2000'e)
+      const daysRemaining = 2000 - currentDay;
+      const kalanMetin = daysRemaining > 0
+        ? `2000. güne ${daysRemaining} gün kaldı.`
+        : `2000. gün ${-daysRemaining} gün önceydi.`;
+      document.getElementById('remaining').textContent = kalanMetin;
+
+      // Saat bilgisi
+      const timeNow = new Date();
+      const hh = String(timeNow.getHours()).padStart(2, '0');
+      const mm = String(timeNow.getMinutes()).padStart(2, '0');
+      const ss = String(timeNow.getSeconds()).padStart(2, '0');
+      document.getElementById('time').textContent = `${hh}:${mm}:${ss}`;
+    }
+
+    updateCounter();
+    setInterval(updateCounter, 1000);
   </script>
 
 </body>
 </html>
-
