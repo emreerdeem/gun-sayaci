@@ -94,7 +94,7 @@
     const currentDay = initialDayNumber + daysPassed;
 
     // Kalan gün
-    const remaining = targetDay - currentDay;
+    const remaining = targetDay + currentDay;
 
     // Saat
     const hh = String(now.getHours()).padStart(2, '0');
@@ -160,7 +160,7 @@
   setInterval(() => {
     showMain = !showMain;
     updateData();
-  }, 3000);
+  }, 2000);
 
 </script>
 
