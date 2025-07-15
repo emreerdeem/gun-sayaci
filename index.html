@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Gün Sayacı - Sade Geri Sayım</title>
+<title>Gün Sayacı - Canlı Geri Sayım</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
 
@@ -34,7 +34,7 @@
     border-radius: 20px;
     padding: 40px 50px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    width: 380px;
+    width: 370px;
     text-align: center;
     box-sizing: border-box;
     z-index: 1;
@@ -72,16 +72,7 @@
     user-select: none;
   }
 
-  .countdown {
-    margin-top: 20px;
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #ffe600;
-    text-shadow: 0 1px 4px #ffce00;
-    user-select: none;
-  }
-
-  .progress-bar-container {
+  .bar-container {
     margin-top: 35px;
     background: rgba(255, 255, 255, 0.25);
     border-radius: 25px;
@@ -92,7 +83,7 @@
     position: relative;
   }
 
-  .progress-bar {
+  .bar {
     height: 100%;
     background: linear-gradient(90deg, #ffce00, #ffaa00);
     width: 0%;
@@ -115,6 +106,15 @@
     font-size: 1.1rem;
   }
 
+  .countdown {
+    margin-top: 10px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #ffe600;
+    text-shadow: 0 1px 4px #ffce00;
+    min-height: 32px;
+  }
+
   @media(max-width: 400px){
     .counter {
       width: 90%;
@@ -125,12 +125,25 @@
       font-size: 2.2rem;
     }
 
-    .countdown {
-      font-size: 1.3rem;
+    p {
+      font-size: 1.1rem;
+    }
+
+    .number {
+      font-size: 2.6rem;
+    }
+
+    .emoji {
+      font-size: 2rem;
+      margin-left: 6px;
     }
 
     .progress-text {
       font-size: 1rem;
+    }
+
+    .countdown {
+      font-size: 1.1rem;
     }
   }
 </style>
@@ -142,22 +155,33 @@
 <div class="counter" role="main" aria-label="Gün Sayacı">
   <h1>Gün Sayacı</h1>
 
-  <p>2000. güne kalan:</p>
-  <div class="countdown" id="countdownTimer" aria-live="polite" aria-atomic="true" role="timer">
-    -- gün -- saat -- dakika -- saniye
+  <p>Bugün:</p>
+  <div class="number" id="currentDay">
+    0 <span class="emoji" title="Alev">🔥</span>
   </div>
 
-  <div class="progress-bar-container" aria-label="İlerleme durumu">
-    <div class="progress-bar" id="progressBar"></div>
+  <p>2000. güne kalan:</p>
+  <div class="number" id="daysLeft">
+    0 <span class="emoji" title="Azalan">⬇️</span>
+  </div>
+
+  <div class="countdown" id="countdownTimer" aria-live="polite" aria-atomic="true" role="timer">
+    -- saat -- dakika -- saniye kaldı
+  </div>
+
+  <div class="bar-container" aria-label="İlerleme durumu">
+    <div class="bar" id="progressBar"></div>
     <div class="progress-text" id="progressText">0%</div>
   </div>
 </div>
 
 <script>
+  // Sabitler
   const baseDayNumber = 1000;          // 15 Temmuz 2025 = 1000. gün
   const targetDayNumber = 2000;        // Hedef 2000. gün
   const baseDate = new Date(2025, 6, 15);  // 15 Temmuz 2025
 
+  // Hedef tarih (2000. gün)
   const targetDate = new Date(baseDate);
   targetDate.setDate(targetDate.getDate() + (targetDayNumber - baseDayNumber));
 
@@ -173,30 +197,37 @@
     let daysLeft = targetDayNumber - currentDay;
     if(daysLeft < 0) daysLeft = 0;
 
+    // İlerleme yüzdesi
     const progressPercent = ((currentDay - baseDayNumber) / (targetDayNumber - baseDayNumber)) * 100;
 
+    // Geri sayım için kalan zamanı (gün tam olarak azalmadan)
     let remainingMs = targetDate - now;
     if(remainingMs < 0) remainingMs = 0;
 
+    // Günlük tam süreye göre kalan kısmı (gün tam bitmemiş olabilir)
     const msInDay = 1000 * 60 * 60 * 24;
     let fractionalDayMs = remainingMs % msInDay;
 
-    const remainingDays = Math.floor(remainingMs / msInDay);
+    // Saat, dakika, saniye olarak kalan zaman
     const remainingHours = Math.floor(fractionalDayMs / (1000 * 60 * 60));
     const remainingMinutes = Math.floor((fractionalDayMs % (1000 * 60 * 60)) / (1000 * 60));
     const remainingSeconds = Math.floor((fractionalDayMs % (1000 * 60)) / 1000);
 
-    document.getElementById('countdownTimer').innerText =
-      `${remainingDays} gün (${remainingHours} saat ${remainingMinutes} dakika ${remainingSeconds} saniye) kaldı`;
+    // HTML güncellemeleri
+    document.getElementById('currentDay').childNodes[0].nodeValue = currentDay + ' ';
+    document.getElementById('daysLeft').childNodes[0].nodeValue = daysLeft + ' ';
 
     document.getElementById('progressBar').style.width = progressPercent + '%';
     document.getElementById('progressText').innerText = progressPercent.toFixed(1) + '%';
+
+    document.getElementById('countdownTimer').innerText =
+      `${remainingHours} saat ${remainingMinutes} dakika ${remainingSeconds} saniye kaldı`;
   }
 
   updateCounter();
   setInterval(updateCounter, 1000);
 
-  // Yıldız animasyonu
+  // ----- Yıldız animasyonu -----
   const canvas = document.getElementById('starfield');
   const ctx = canvas.getContext('2d');
   let stars = [];
